@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>SEO Audit Lite — Free Check</title><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-slate-950 text-slate-100 font-[Inter]">
+<main class="max-w-3xl mx-auto p-6">
+  <h1 class="text-3xl font-semibold">SEO Audit Lite</h1>
+  <p class="mt-2 text-slate-400">Quick check: sitemap, robots “Sitemap:” line, and 5‑image alt‑text sample.</p>
+  <form id="f" class="mt-6 grid gap-3">
+    <input id="domain" class="px-3 py-2 rounded bg-slate-900 border border-slate-800" placeholder="example.com"/>
+    <button class="px-4 py-2 rounded bg-blue-600">Run check</button>
+  </form>
+  <pre id="out" class="mt-6 bg-slate-900 border border-slate-800 rounded p-3 text-sm overflow-auto"></pre>
+
+  <section class="mt-10 border-t border-slate-800 pt-6">
+    <h2 class="text-xl font-semibold">Pro plan</h2>
+    <p class="mt-2 text-slate-400">Batch CSV audits, export, and saved history.</p>
+    <button id="buy" class="mt-3 px-4 py-2 rounded bg-emerald-600">Upgrade</button>
+  </section>
+</main>
+<script>
+const f=document.getElementById('f'), out=document.getElementById('out');
+f.addEventListener('submit', async (e)=>{
+  e.preventDefault(); out.textContent='Checking...';
+  const domain=document.getElementById('domain').value.trim();
+  const res=await fetch(`/api/quick?domain=${encodeURIComponent(domain)}`);
+  const data=await res.json(); out.textContent=JSON.stringify(data,null,2);
+});
+
+document.getElementById('buy').addEventListener('click', async()=>{
+  const res=await fetch('/api/checkout', {method:'POST'});
+  const data=await res.json(); if(data.url){ location.href=data.url } else { alert('Checkout error') }
+});
+</script>
+</body></html>
