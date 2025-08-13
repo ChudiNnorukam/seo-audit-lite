@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare Pages (Wrangler CLI)
 
 on:
   push:
@@ -10,15 +10,33 @@ jobs:
     permissions:
       contents: read
       deployments: write
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      WRANGLER_LOG: debug
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Node & Wrangler
+        run: |
+          node -v || true
+          npm -v || true
+          npm i -g wrangler@4
+          wrangler --version
+
+      - name: Debug tree
+        run: |
+          pwd
+          ls -la
+          echo '--- functions ---'
+          ls -la functions || true
+          echo '--- public ---'
+          ls -la public || true
+
+      - name: Wrangler whoami
+        run: wrangler whoami
+
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: seo-audit-lite
-          directory: ./public
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          wrangler pages deploy ./public --project-name seo-audit-lite
